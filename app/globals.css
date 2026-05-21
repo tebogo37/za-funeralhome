@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply py-20 lg:py-28;
+  }
+  
+  .card {
+    @apply bg-white border border-zinc-100 rounded-3xl overflow-hidden hover:shadow-xl transition-all duration-300;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,5 +47,4 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
