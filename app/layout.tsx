@@ -32,10 +32,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <Canonical />
-
-      </head>
-      <body className="bg-zinc-50 text-zinc-900">
-        {/* Google Tag Manager - Manual Implementation */}
+               {/* Google Tag Manager - Manual Implementation */}
         <Script id="gtm-script" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -45,6 +42,10 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-5R3R4SCR');
           `}
         </Script>
+
+      </head>
+      <body className="bg-zinc-50 text-zinc-900">
+ 
  
         {/* noscript fallback (for users with JS disabled) */}
         <noscript>
