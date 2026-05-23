@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { Phone, MessageCircle, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -21,18 +22,18 @@ export default function Header() {
     <>
       <header className="bg-white border-b sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-            <div className="w-9 h-9 bg-emerald-800 rounded-full flex items-center justify-center text-white font-bold text-xl">
-              SA
-            </div>
-            <div>
-              <h1 className="font-semibold text-lg sm:text-2xl tracking-tight text-emerald-950 leading-none">
-                SA Funeral Homes
-              </h1>
-              <p className="text-xs text-emerald-600">South Africa Funeral Directory</p>
-            </div>
-          </Link>
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+              {/* PNG Logo */}
+              <Image
+                src="/funeral-homes-logo-04.png"           // ← Change if your file has a different name
+                alt="SA Funeral Homes"
+                width={90}
+                height={40}
+                className="h-10 w-auto"    // Matches current height, easy to adjust
+                priority                  // Good for logo in header
+              />
+            </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-medium">

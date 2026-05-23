@@ -265,8 +265,8 @@ export default function Home() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'LastRespect',
-            url: 'https://yourdomain.com',
+            name: 'SA Funeral Homes',
+            url: 'https://safuneralhomes.co.za',
             description: 'Funeral home directory and comparison platform for Gauteng',
             publisher: {
               '@type': 'Organization',

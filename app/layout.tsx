@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { MessageCircle } from 'lucide-react';
+import Canonical from '@/components/seo/Canonical';
 
 export const metadata: Metadata = {
   title: 'SA Funeral Homes | Funeral Services & Insurance South Africa',
@@ -27,6 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Canonical />
+
+      </head>
       <body className="bg-zinc-50 text-zinc-900">
         <Header />
         <main>{children}</main>
