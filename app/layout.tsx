@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { MessageCircle } from 'lucide-react';
 import Canonical from '@/components/seo/Canonical';
+import { GoogleTagManager } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
   title: 'SA Funeral Homes | Funeral Services & Insurance South Africa',
@@ -33,6 +34,7 @@ export default function RootLayout({
 
       </head>
       <body className="bg-zinc-50 text-zinc-900">
+        <GoogleTagManager gtmId="GTM-5R3R4SCR" />
         <Header />
         <main>{children}</main>
         <Footer />
