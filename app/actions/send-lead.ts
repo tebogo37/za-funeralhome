@@ -41,7 +41,7 @@ export async function saveLeadAndNotify(formData: FormData) {
     return { success: false };
   }
 
-  // Send email
+  // Send email + Now 
   await sendLeadNotification(leadData);
 
   return { success: true };
