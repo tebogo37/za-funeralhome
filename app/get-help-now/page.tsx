@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { saveLead } from '@/lib/leads';
+import Link from 'next/link';
+import { saveLeadAndNotify } from '@/app/actions/send-lead';
 
 export default function GetHelpNow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -13,20 +14,18 @@ export default function GetHelpNow() {
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-    
-    await saveLead({
-      name: formData.get('name') as string,
-      phone: formData.get('phone') as string,
-      suburb: formData.get('suburb') as string,
-      serviceType: formData.get('serviceType') as string,
-      budget: formData.get('budget') as string || undefined,
-      message: formData.get('message') as string || undefined,
-      source: 'get-help-now',
-      url: window.location.href,
-    });
+    formData.append('source', 'get-help-now');
+    formData.append('url', window.location.href);
+
+    const result = await saveLeadAndNotify(formData);
+
+    if (result.success) {
+      setSubmitted(true);
+    } else {
+      alert("Something went wrong. Please try again.");
+    }
 
     setIsSubmitting(false);
-    setSubmitted(true);
   };
 
   if (submitted) {
@@ -37,19 +36,21 @@ export default function GetHelpNow() {
           Your request has been received.<br />
           A local funeral home will contact you shortly.
         </p>
-        <a href="/" className="text-emerald-700 underline">Return to Homepage</a>
+        <Link href="/" className="text-emerald-700 underline">
+          Return to Homepage
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-16" suppressHydrationWarning>
+    <div className="max-w-2xl mx-auto px-6 py-16">
       <div className="text-center mb-12">
         <h1 className="text-5xl font-semibold tracking-tight mb-6">Get Help Right Now</h1>
         <p className="text-xl text-zinc-600">We’ll connect you with suitable funeral homes in your area.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border p-10 space-y-8" suppressHydrationWarning>
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl border p-10 space-y-8">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium mb-2">Your Name</label>
