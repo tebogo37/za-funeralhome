@@ -29,6 +29,14 @@ export default function ProfileSidebar({ home }: ProfileSidebarProps) {
     if (result.success) {
       alert(`Thank you! Your quote request has been sent to ${home.name}.`);
       setShowQuoteModal(false);
+      // After successful save
+        if (typeof window !== 'undefined' && window.dataLayer) {
+          window.dataLayer.push({
+            event: 'quote_request',
+            funeral_home: home.name,
+            service_type: formData.get('serviceType'),
+          });
+        }
     } else {
       alert("Something went wrong. Please try again.");
     }

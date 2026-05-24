@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { MessageCircle } from 'lucide-react';
 import Canonical from '@/components/seo/Canonical';
+import ConsentBanner from '@/components/ui/ConsentBanner';
 import { GoogleTagManager } from '@next/third-parties/google';
 
 
@@ -28,7 +29,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -43,6 +44,8 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+
+        <ConsentBanner />
 
         {/* Floating WhatsApp */}
         <a 

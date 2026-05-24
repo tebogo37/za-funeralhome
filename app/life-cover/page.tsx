@@ -9,6 +9,15 @@ export async function generateMetadata() {
   };
 }
 
+    // After Life Cover
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+        event: 'insurance_viewed',
+        insurance_type: 'life'     // or 'life'
+      });
+
+      }
+
 export default function LifeCoverPage() {
   return (
     <div className="bg-zinc-50 min-h-screen">

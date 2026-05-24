@@ -22,6 +22,16 @@ export default function ComparePage() {
 
   const selected = funeralHomes.filter(h => selectedHomes.includes(h.id));
 
+  
+      // After loading compare
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+        event: 'comparison_used',
+        homes_count: selectedHomes.length
+      });
+
+      }
+
   return (
     <div className="min-h-screen bg-zinc-50">
       <div className="max-w-7xl mx-auto px-6 py-16">

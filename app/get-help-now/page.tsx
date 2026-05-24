@@ -24,6 +24,16 @@ export default function GetHelpNow() {
 
       if (result.success) {
         setSubmitted(true);
+        // After successful save
+          if (typeof window !== 'undefined' && window.dataLayer) {
+            window.dataLayer.push({
+              event: 'lead_form_submit',
+              form_source: 'get-help-now',
+              suburb: formData.get('suburb'),
+              service_type: formData.get('serviceType'),
+            });
+          }
+
       } else {
         setError('Something went wrong. Please try again or call us directly.');
       }
@@ -36,6 +46,7 @@ export default function GetHelpNow() {
   };
 
   if (submitted) {
+    
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-20 sm:py-24 text-center">
         <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">

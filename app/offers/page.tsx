@@ -11,6 +11,15 @@ export async function generateMetadata() {
   };
 }
 
+    // After loading the offer
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+       event: 'offers_viewed',
+  offer_count: offers.length
+      });
+
+      }
+
 export default function OffersPage() {
   return (
     <div className="bg-zinc-50 min-h-screen">

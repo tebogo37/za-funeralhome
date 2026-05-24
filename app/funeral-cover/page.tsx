@@ -37,6 +37,15 @@ export default function FuneralCoverPage() {
     },
   ];
 
+      // After Funeral cover
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+        event: 'insurance_viewed',
+        insurance_type: 'funeral'     // or 'life'
+      });
+
+      }
+
   return (
     <div className="bg-zinc-50 min-h-screen">
       {/* Back Link */}

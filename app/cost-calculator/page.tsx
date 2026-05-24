@@ -54,6 +54,14 @@ export default function CostCalculator() {
     if (result.success) {
       alert("Thank you! Your estimate has been received. A funeral home will contact you shortly.");
       setStep('intro'); // Reset
+      // After successful save
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+          event: 'cost_calculator_complete',
+          estimated_amount: totalEstimate,
+          service_type: calc.serviceType,
+        });
+      }
     } else {
       alert("Something went wrong. Please try again.");
     }

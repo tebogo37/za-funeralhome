@@ -41,6 +41,19 @@ export default async function SearchResults({ searchParams }: Props) {
     }
   }
 
+
+
+      // After Search
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+        event: 'search_performed',
+        suburb: suburb || 'unknown',
+        service_type: serviceType || 'any',
+        results_count: results.length
+      });
+
+      }
+
   return (
     <div className="bg-zinc-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-6 py-16">
