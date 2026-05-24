@@ -38,7 +38,7 @@ export default function RootLayout({
       </head>
       <body className="bg-zinc-50 text-zinc-900">
  
-        <GoogleTagManager gtmId="G-W0Z5RTT6HQ" />
+        <GoogleTagManager gtmId="GTM-5R3R4SCR" />
          
         <Header />
         <main>{children}</main>
