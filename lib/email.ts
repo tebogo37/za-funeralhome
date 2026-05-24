@@ -21,9 +21,12 @@ export async function sendLeadNotification(leadData: LeadData) {
         'api-key': process.env.BREVO_API_KEY || '',
       },
       body: JSON.stringify({
-        sender: { email: 'leads@safuneralhomes.co.za', name: 'SA Funeral Homes' },
+        sender: { 
+          email: 'leads@safuneralhomes.co.za', 
+          name: 'SA Funeral Homes' 
+        },
         to: [{ email: 'criptonique@gmail.com' }], 
-        subject: `New Lead: ${leadData.name}`,
+        subject: `New Lead: ${leadData.name} - ${leadData.source}`,
         htmlContent: `
           <h2>New Lead Received</h2>
           <p><strong>Name:</strong> ${leadData.name}</p>
@@ -31,16 +34,17 @@ export async function sendLeadNotification(leadData: LeadData) {
           <p><strong>Suburb:</strong> ${leadData.suburb}</p>
           ${leadData.funeral_home_name ? `<p><strong>Funeral Home:</strong> ${leadData.funeral_home_name}</p>` : ''}
           <p><strong>Source:</strong> ${leadData.source}</p>
+          <p><strong>Time:</strong> ${new Date().toLocaleString('en-ZA')}</p>
         `
       })
     });
 
     if (response.ok) {
-      console.log('✅ Email sent successfully');
+      console.log('✅ Brevo Email Sent');
     } else {
       console.error('❌ Brevo Error:', await response.text());
     }
   } catch (error) {
-    console.error('❌ Failed to send email:', error);
+    console.error('❌ Email sending failed:', error);
   }
 }

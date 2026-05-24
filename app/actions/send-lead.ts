@@ -1,6 +1,7 @@
 // app/actions/send-lead.ts
 'use server';
 
+import { supabase } from '@/lib/supabase';
 import { sendLeadNotification } from '@/lib/email';
 import fs from 'fs';
 import path from 'path';
@@ -19,75 +20,6 @@ type LeadData = {
   tracking_code?: string;
 };
 
-// Local file fallback — always save regardless of Supabase status
-async function saveToFile(leadData: LeadData) {
-  try {
-    const LEADS_FILE = path.join(process.cwd(), 'data', 'leads.json');
-    const dataDir = path.dirname(LEADS_FILE);
-    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-
-    const lead = {
-      ...leadData,
-      id: 'lead_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 7),
-      timestamp: new Date().toISOString(),
-      status: 'new',
-    };
-
-    let leads: object[] = [];
-    if (fs.existsSync(LEADS_FILE)) {
-      try {
-        leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8'));
-      } catch {
-        leads = [];
-      }
-    }
-
-    leads.unshift(lead);
-    fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
-    console.log('✅ Lead saved to file:', lead.id);
-    return lead;
-  } catch (fileError) {
-    console.error('❌ File save failed:', fileError);
-    return null;
-  }
-}
-
-// Supabase save — optional, gracefully degrades
-async function saveToSupabase(leadData: LeadData): Promise<boolean> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    console.warn('⚠️ Supabase env vars not set — skipping Supabase save');
-    return false;
-  }
-
-  try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/leads`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`,
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify(leadData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Supabase error:', response.status, errorText);
-      return false;
-    }
-
-    console.log('✅ Lead saved to Supabase');
-    return true;
-  } catch (error) {
-    console.error('❌ Supabase request failed:', error);
-    return false;
-  }
-}
-
 export async function saveLeadAndNotify(formData: FormData) {
   const leadData: LeadData = {
     name: (formData.get('name') as string)?.trim() || '',
@@ -104,30 +36,54 @@ export async function saveLeadAndNotify(formData: FormData) {
   };
 
   // Validate required fields
-  if (!leadData.name || !leadData.phone) {
-    console.error('❌ Missing required fields: name or phone');
+  if (!leadData.name || !leadData.phone || !leadData.suburb) {
+    console.error('❌ Missing required fields: name, phone or suburb');
     return { success: false, error: 'Missing required fields' };
   }
 
-  // Always save to file as baseline
-  const fileSave = await saveToFile(leadData);
+  // 1. Save to Supabase
+  const { error: supabaseError } = await supabase.from('leads').insert([leadData]);
 
-  // Try Supabase (non-blocking fallback)
-  const supabaseSaved = await saveToSupabase(leadData);
-
-  // If neither worked, return failure
-  if (!fileSave && !supabaseSaved) {
-    console.error('❌ Both save methods failed');
-    return { success: false, error: 'Could not save lead' };
+  if (supabaseError) {
+    console.error('Supabase Error:', supabaseError);
+  } else {
+    console.log('✅ Lead saved to Supabase');
   }
 
-  // Send email notification (non-blocking)
+  // 2. Save to Local File (Backup)
   try {
-    await sendLeadNotification(leadData);
-  } catch (emailError) {
-    // Don't fail the form submission if email fails
-    console.error('❌ Email notification failed (non-fatal):', emailError);
+    const LEADS_FILE = path.join(process.cwd(), 'data', 'leads.json');
+    const dataDir = path.dirname(LEADS_FILE);
+
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    let leads: LeadData[] = [];
+    if (fs.existsSync(LEADS_FILE)) {
+      try {
+        leads = JSON.parse(fs.readFileSync(LEADS_FILE, 'utf8'));
+      } catch {
+        leads = [];
+      }
+    }
+
+    const leadWithMeta = {
+      ...leadData,
+      id: 'lead_' + Date.now().toString(36),
+      timestamp: new Date().toISOString(),
+      status: 'new' as const,
+    };
+
+    leads.unshift(leadWithMeta);
+    fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
+    console.log('✅ Lead saved to local file');
+  } catch (fileError) {
+    console.error('❌ Local file save failed:', fileError);
   }
+
+  // 3. Send Email via Brevo
+  await sendLeadNotification(leadData);
 
   return { success: true };
 }
