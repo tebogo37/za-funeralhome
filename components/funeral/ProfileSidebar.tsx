@@ -13,6 +13,7 @@ interface ProfileSidebarProps {
 export default function ProfileSidebar({ home }: ProfileSidebarProps) {
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleQuoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,16 +28,16 @@ export default function ProfileSidebar({ home }: ProfileSidebarProps) {
     const result = await saveLeadAndNotify(formData);
 
     if (result.success) {
-      alert(`Thank you! Your quote request has been sent to ${home.name}.`);
-      setShowQuoteModal(false);
-      // After successful save
-        if (typeof window !== 'undefined' && window.dataLayer) {
-          window.dataLayer.push({
-            event: 'quote_request',
-            funeral_home: home.name,
-            service_type: formData.get('serviceType'),
-          });
-        }
+      setSubmitted(true);
+      
+      // GTM Event
+      if (typeof window !== 'undefined' && window.dataLayer) {
+        window.dataLayer.push({
+          event: 'quote_request',
+          funeral_home: home.name,
+          service_type: formData.get('serviceType'),
+        });
+      }
     } else {
       alert("Something went wrong. Please try again.");
     }
@@ -44,11 +45,43 @@ export default function ProfileSidebar({ home }: ProfileSidebarProps) {
     setIsSubmitting(false);
   };
 
+  // Thank You Screen inside Modal
+  if (submitted) {
+    return (
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
+        <div className="bg-white rounded-3xl max-w-lg w-full p-12 text-center">
+          <h2 className="text-3xl font-semibold mb-6">Thank You</h2>
+          <p className="text-xl text-zinc-600 mb-8">
+            Your quote request has been sent to <strong>{home.name}</strong>.<br />
+            They will contact you shortly via phone or WhatsApp.
+          </p>
+          <button 
+            onClick={() => {
+              setShowQuoteModal(false);
+              setSubmitted(false);
+            }}
+            className="bg-emerald-700 hover:bg-emerald-800 text-white px-10 py-4 rounded-2xl font-medium transition"
+          >
+            Close Window
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white border rounded-3xl p-8 sticky top-8">
       <div className="flex flex-wrap gap-2 mb-6">
-        {home.isClaimed && <div className="bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-medium">✓ Verified</div>}
-        {home.promoted && <div className="bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm font-medium">Premium</div>}
+        {home.isClaimed && (
+          <div className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-medium">
+            ✓ Verified
+          </div>
+        )}
+        {home.promoted && (
+          <div className="inline-flex items-center gap-1.5 bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm font-medium">
+            Premium
+          </div>
+        )}
       </div>
 
       <h3 className="font-semibold text-xl mb-6">Get In Touch</h3>
@@ -96,7 +129,12 @@ export default function ProfileSidebar({ home }: ProfileSidebarProps) {
                   <h2 className="text-3xl font-semibold">Get Personalized Quote</h2>
                   <p className="text-zinc-600 mt-1">From <strong>{home.name}</strong></p>
                 </div>
-                <button onClick={() => setShowQuoteModal(false)} className="text-4xl text-zinc-400 hover:text-black">×</button>
+                <button 
+                  onClick={() => setShowQuoteModal(false)}
+                  className="text-4xl leading-none text-zinc-400 hover:text-zinc-600"
+                >
+                  ×
+                </button>
               </div>
 
               <form onSubmit={handleQuoteSubmit} className="space-y-6">
@@ -122,7 +160,7 @@ export default function ProfileSidebar({ home }: ProfileSidebarProps) {
                 <button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-5 rounded-2xl font-medium text-lg"
+                  className="w-full bg-emerald-700 hover:bg-emerald-800 disabled:opacity-70 text-white py-5 rounded-2xl font-medium text-lg transition"
                 >
                   {isSubmitting ? "Submitting..." : "Submit Request"}
                 </button>

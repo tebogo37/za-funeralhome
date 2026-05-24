@@ -21,7 +21,6 @@ export default function CostCalculator() {
 
   const calculateEstimate = () => {
     let base = calc.serviceType === 'burial' ? 14500 : 8500;
-
     if (calc.coffinTier === 'standard') base += 3500;
     if (calc.coffinTier === 'premium') base += 7500;
 
@@ -45,16 +44,14 @@ export default function CostCalculator() {
     formData.append('suburb', leadInfo.suburb);
     formData.append('serviceType', calc.serviceType);
     formData.append('budget', `Around R${totalEstimate.toLocaleString('en-ZA')}`);
-    formData.append('message', `Service: ${calc.serviceType}, People: ${calc.peopleCount}, Cow: ${calc.includeCow}, Tent: ${calc.includeTentChairs}`);
+    formData.append('message', `People: ${calc.peopleCount}, Cow: ${calc.includeCow}, Tent: ${calc.includeTentChairs}`);
     formData.append('source', 'cost-calculator');
     formData.append('url', window.location.href);
 
     const result = await saveLeadAndNotify(formData);
 
     if (result.success) {
-      alert("Thank you! Your estimate has been received. A funeral home will contact you shortly.");
-      setStep('intro'); // Reset
-      // After successful save
+      // GTM Event
       if (typeof window !== 'undefined' && window.dataLayer) {
         window.dataLayer.push({
           event: 'cost_calculator_complete',
@@ -62,6 +59,8 @@ export default function CostCalculator() {
           service_type: calc.serviceType,
         });
       }
+      alert("Thank you! Your estimate has been received. A funeral home will contact you shortly.");
+      setStep('intro');
     } else {
       alert("Something went wrong. Please try again.");
     }
@@ -82,9 +81,6 @@ export default function CostCalculator() {
         {step === 'intro' && (
           <div className="bg-white rounded-3xl p-12 text-center">
             <h2 className="text-3xl font-semibold mb-6">Ready to plan with clarity?</h2>
-            <p className="text-lg text-zinc-600 mb-10 max-w-md mx-auto">
-              Our calculator uses real pricing data from Gauteng funeral homes.
-            </p>
             <button 
               onClick={() => setStep('calculator')}
               className="bg-emerald-700 hover:bg-emerald-800 text-white px-12 py-5 rounded-2xl text-lg font-medium"
@@ -98,25 +94,8 @@ export default function CostCalculator() {
           <div className="bg-white rounded-3xl shadow-xl p-10">
             <h2 className="text-3xl font-semibold mb-10 text-center">Build Your Package</h2>
 
-            <div className="space-y-10">
-              <div>
-                <label className="block text-sm font-medium mb-4">Service Type</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => setCalc({...calc, serviceType: 'burial'})} 
-                    className={`p-6 rounded-2xl border-2 transition ${calc.serviceType === 'burial' ? 'border-emerald-700 bg-emerald-50' : 'border-zinc-200'}`}>
-                    Burial
-                  </button>
-                  <button onClick={() => setCalc({...calc, serviceType: 'cremation'})} 
-                    className={`p-6 rounded-2xl border-2 transition ${calc.serviceType === 'cremation' ? 'border-emerald-700 bg-emerald-50' : 'border-zinc-200'}`}>
-                    Cremation
-                  </button>
-                </div>
-              </div>
-
-              {/* Rest of your calculator UI remains the same */}
-              {/* ... keep your existing calculator fields ... */}
-
-            </div>
+            {/* Your existing calculator UI - keep as is */}
+            {/* ... paste your calculator fields here ... */}
 
             <div className="mt-12 pt-8 border-t text-center">
               <p className="text-5xl font-bold text-emerald-700 mb-2">R{totalEstimate.toLocaleString('en-ZA')}</p>
@@ -137,7 +116,6 @@ export default function CostCalculator() {
             
             <div className="text-center mb-12">
               <div className="text-6xl font-bold text-emerald-700">R{totalEstimate.toLocaleString('en-ZA')}</div>
-              <p className="text-zinc-500 mt-2">Realistic estimate based on current Gauteng prices</p>
             </div>
 
             <form onSubmit={handleLeadSubmit} className="max-w-md mx-auto space-y-6">
